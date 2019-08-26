@@ -18,19 +18,19 @@ def convert(bibtex):
                 line = r[i].strip()
                 # print(line)
                 if line.startswith("title"):
-                    title = line.split('{')[-1][:-2]
+                    title = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("journal"):
-                    venue = line.split('{')[-1][:-2]
+                    venue = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("volume"):
-                    volume = line.split('{')[-1][:-2]
+                    volume = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("number"):
-                    number = line.split('{')[-1][:-2]
+                    number = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("pages"):
-                    pages = line.split('{')[-1][:-2]
+                    pages = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("year"):
-                    year = line.split('{')[-1][:-2]
+                    year = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("publisher"):
-                    publisher = line.split('{')[-1][:-2]
+                    publisher = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("author"):
                     authors = line[line.find("{") + 1:line.rfind("}")]
                     for LastFirst in authors.split('and'):
@@ -55,6 +55,8 @@ def convert(bibtex):
                     bibitem += " ({})".format(year)
             if publisher and not venue:
                 bibitem += "({},{})".format(publisher, year)
+            if not venue and not publisher and year:
+                bibitem += " ({})".format(year)
     return bibitem
 
 @app.route('/')
