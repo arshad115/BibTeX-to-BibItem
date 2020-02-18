@@ -11,7 +11,7 @@ def convert(bibtex):
         if not line: i += 1
         if '@' == line[0]:
             code = line.split('{')[-1][:-1]
-            title = venue = volume = number = pages = year = publisher = authors = None
+            title = venue = volume = number = pages = year = publisher = howpublished = note = authors = None
             output_authors = []
             i += 1
             while i < len(r) and '@' not in r[i]:
@@ -31,13 +31,19 @@ def convert(bibtex):
                     year = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("publisher"):
                     publisher = line[line.find("{") + 1:line.rfind("}")]
+                elif line.startswith("howpublished"):
+                    howpublished = line[line.find("{") + 1:line.rfind("}")]
+                elif line.startswith("note"):
+                    note = line[line.find("{") + 1:line.rfind("}")]
                 elif line.startswith("author"):
                     authors = line[line.find("{") + 1:line.rfind("}")]
                     for LastFirst in authors.split('and'):
                         lf = LastFirst.replace(' ', '').split(',')
-                        if len(lf) != 2: continue
-                        last, first = lf[0], lf[1]
-                        output_authors.append("{}, {}.".format(last.capitalize(), first.capitalize()[0]))
+                        if len(lf) != 2:
+                            output_authors.append("{}.".format(authors.capitalize()))
+                        else:
+                            last, first = lf[0], lf[1]
+                            output_authors.append("{}, {}.".format(last.capitalize(), first.capitalize()[0]))
                 i += 1
 
             bibitem += "\\bibitem{%s}" % code
@@ -57,6 +63,10 @@ def convert(bibtex):
                 bibitem += "({},{})".format(publisher, year)
             if not venue and not publisher and year:
                 bibitem += " ({})".format(year)
+            if howpublished:
+                bibitem += ", {}".format(howpublished)
+            if note:
+                bibitem += ", {}".format(note)
     return bibitem
 
 @app.route('/')
